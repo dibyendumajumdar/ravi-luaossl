@@ -1531,15 +1531,15 @@ static const EVP_MD *auxL_optdigest(lua_State *L, int index, EVP_PKEY *key, cons
 /* dl_anchor must not be called from multiple threads at once */
 static int dl_anchor(void) {
 #if _WIN32
-	EXPORT extern int luaopen__openssl(lua_State *);
+	EXPORT extern int luaopen_luaossl(lua_State *);
 
 	HMODULE dummy;
-	if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN|GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (void *)&luaopen__openssl, &dummy))
+	if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN|GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (void *)&luaopen_luaossl, &dummy))
 		return GetLastError();
 
 	return 0;
 #elif HAVE_DLADDR
-	extern int luaopen__openssl(lua_State *);
+	extern int luaopen_luaossl(lua_State *);
 	static void *anchor;
 	Dl_info info;
 	int error = 0;
@@ -1547,7 +1547,7 @@ static int dl_anchor(void) {
 	if (anchor)
 		goto epilog;
 
-	if (!dladdr((void *)&luaopen__openssl, &info))
+	if (!dladdr((void *)&luaopen_luaossl, &info))
 		goto dlerr;
 
 	if (!(anchor = dlopen(info.dli_fname, RTLD_NOW|RTLD_LOCAL)))
@@ -3023,7 +3023,7 @@ static void initall(lua_State *L);
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-EXPORT int luaopen__openssl_compat(lua_State *L) {
+EXPORT int luaopen_luaossl_compat(lua_State *L) {
 	initall(L);
 
 	lua_newtable(L);
@@ -3031,7 +3031,7 @@ EXPORT int luaopen__openssl_compat(lua_State *L) {
 	lua_setfield(L, -2, "X509_STORE_FREE_BUG");
 
 	return 1;
-} /* luaopen__openssl_compat() */
+} /* luaopen_luaossl_compat() */
 
 
 /*
@@ -3248,7 +3248,7 @@ static const auxL_IntegerReg openssl_integers[] = {
 	{ NULL, 0 },
 };
 
-EXPORT int luaopen__openssl(lua_State *L) {
+EXPORT int luaopen_luaossl(lua_State *L) {
 	size_t i;
 
 	auxL_newlib(L, ossl_globals, 0);
@@ -3272,7 +3272,7 @@ EXPORT int luaopen__openssl(lua_State *L) {
 	lua_setfield(L, -2, "SHLIB_VERSION_NUMBER");
 
 	return 1;
-} /* luaopen__openssl() */
+} /* luaopen_luaossl() */
 
 
 /*
@@ -4009,13 +4009,13 @@ static const auxL_Reg bn_globals[] = {
 	{ NULL,            NULL },
 };
 
-EXPORT int luaopen__openssl_bignum(lua_State *L) {
+EXPORT int luaopen_luaossl_bignum(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, bn_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_bignum() */
+} /* luaopen_luaossl_bignum() */
 
 
 /*
@@ -5394,22 +5394,22 @@ static const auxL_IntegerReg pk_rsa_pad_opts[] = {
 	{ NULL, 0 },
 };
 
-EXPORT int luaopen__openssl_pkey(lua_State *L) {
+EXPORT int luaopen_luaossl_pkey(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, pk_globals, 0);
 	auxL_setintegers(L, pk_rsa_pad_opts);
 
 	return 1;
-} /* luaopen__openssl_pkey() */
+} /* luaopen_luaossl_pkey() */
 
 
 /*
  * Deprecated module name.
  */
-EXPORT int luaopen__openssl_pubkey(lua_State *L) {
-	return luaopen__openssl_pkey(L);
-} /* luaopen__openssl_pubkey() */
+EXPORT int luaopen_luaossl_pubkey(lua_State *L) {
+	return luaopen_luaossl_pkey(L);
+} /* luaopen_luaossl_pubkey() */
 
 
 /*
@@ -5601,7 +5601,7 @@ static const auxL_Reg ecg_globals[] = {
 
 #endif /* OPENSSL_NO_EC */
 
-EXPORT int luaopen__openssl_ec_group(lua_State *L) {
+EXPORT int luaopen_luaossl_ec_group(lua_State *L) {
 #ifndef OPENSSL_NO_EC
 	initall(L);
 
@@ -5611,7 +5611,7 @@ EXPORT int luaopen__openssl_ec_group(lua_State *L) {
 #else
 	return 0;
 #endif
-} /* luaopen__openssl_ec_group() */
+} /* luaopen_luaossl_ec_group() */
 
 
 /*
@@ -5809,13 +5809,13 @@ static const auxL_Reg xn_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_x509_name(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_name(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, xn_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_x509_name() */
+} /* luaopen_luaossl_x509_name() */
 
 
 /*
@@ -6061,13 +6061,13 @@ static const auxL_Reg gn_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_x509_altname(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_altname(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, gn_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_x509_altname() */
+} /* luaopen_luaossl_x509_altname() */
 
 
 /*
@@ -6363,14 +6363,14 @@ static const auxL_IntegerReg xe_textopts[] = {
 	{ NULL, 0 },
 };
 
-EXPORT int luaopen__openssl_x509_extension(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_extension(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, xe_globals, 0);
 	auxL_setintegers(L, xe_textopts);
 
 	return 1;
-} /* luaopen__openssl_x509_extension() */
+} /* luaopen_luaossl_x509_extension() */
 
 
 /*
@@ -7572,13 +7572,13 @@ static const auxL_Reg xc_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_x509_cert(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_cert(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, xc_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_x509_cert() */
+} /* luaopen_luaossl_x509_cert() */
 
 
 /*
@@ -8003,13 +8003,13 @@ static const auxL_Reg xr_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_x509_csr(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_csr(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, xr_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_x509_csr() */
+} /* luaopen_luaossl_x509_csr() */
 
 
 /*
@@ -8518,13 +8518,13 @@ static const auxL_Reg xx_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_x509_crl(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_crl(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, xx_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_x509_crl() */
+} /* luaopen_luaossl_x509_crl() */
 
 
 /*
@@ -8667,13 +8667,13 @@ static const auxL_Reg xl_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_x509_chain(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_chain(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, xl_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_x509_chain() */
+} /* luaopen_luaossl_x509_chain() */
 
 
 /*
@@ -8855,7 +8855,7 @@ static const auxL_Reg xs_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_x509_store(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_store(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, xs_globals, 0);
@@ -8870,7 +8870,7 @@ EXPORT int luaopen__openssl_x509_store(lua_State *L) {
 	lua_setfield(L, -2, "CERT_FILE_EVP");
 
 	return 1;
-} /* luaopen__openssl_x509_store() */
+} /* luaopen_luaossl_x509_store() */
 
 
 /*
@@ -8934,13 +8934,13 @@ static const auxL_Reg stx_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_x509_store_context(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_store_context(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, stx_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_x509_store_context() */
+} /* luaopen_luaossl_x509_store_context() */
 #endif
 
 
@@ -9107,13 +9107,13 @@ static const auxL_Reg p12_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_pkcs12(lua_State *L) {
+EXPORT int luaopen_luaossl_pkcs12(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, p12_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_pkcs12() */
+} /* luaopen_luaossl_pkcs12() */
 
 
 /*
@@ -10491,7 +10491,7 @@ static const auxL_IntegerReg sx_ext[] = {
 	{ NULL, 0 },
 };
 
-EXPORT int luaopen__openssl_ssl_context(lua_State *L) {
+EXPORT int luaopen_luaossl_ssl_context(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, sx_globals, 0);
@@ -10520,7 +10520,7 @@ EXPORT int luaopen__openssl_ssl_context(lua_State *L) {
 	auxL_setintegers(L, sx_ext);
 
 	return 1;
-} /* luaopen__openssl_ssl_context() */
+} /* luaopen_luaossl_ssl_context() */
 
 
 /*
@@ -11285,7 +11285,7 @@ static const auxL_IntegerReg ssl_version[] = {
 };
 
 
-EXPORT int luaopen__openssl_ssl(lua_State *L) {
+EXPORT int luaopen_luaossl_ssl(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, ssl_globals, 0);
@@ -11314,7 +11314,7 @@ EXPORT int luaopen__openssl_ssl(lua_State *L) {
 	auxL_setintegers(L, sx_option);
 
 	return 1;
-} /* luaopen__openssl_ssl() */
+} /* luaopen_luaossl_ssl() */
 
 
 /*
@@ -11579,14 +11579,14 @@ static const auxL_IntegerReg xp_inherit_flags[] = {
 	{ NULL, 0 }
 };
 
-EXPORT int luaopen__openssl_x509_verify_param(lua_State *L) {
+EXPORT int luaopen_luaossl_x509_verify_param(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, xp_globals, 0);
 	auxL_setintegers(L, xp_inherit_flags);
 
 	return 1;
-} /* luaopen__openssl_x509_verify_param() */
+} /* luaopen_luaossl_x509_verify_param() */
 
 
 /*
@@ -11700,13 +11700,13 @@ static const auxL_Reg md_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_digest(lua_State *L) {
+EXPORT int luaopen_luaossl_digest(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, md_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_digest() */
+} /* luaopen_luaossl_digest() */
 
 
 /*
@@ -11812,13 +11812,13 @@ static const auxL_Reg hmac_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_hmac(lua_State *L) {
+EXPORT int luaopen_luaossl_hmac(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, hmac_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_hmac() */
+} /* luaopen_luaossl_hmac() */
 
 
 /*
@@ -12002,13 +12002,13 @@ static const auxL_Reg cipher_globals[] = {
 	{ NULL,        NULL },
 };
 
-EXPORT int luaopen__openssl_cipher(lua_State *L) {
+EXPORT int luaopen_luaossl_cipher(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, cipher_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_cipher() */
+} /* luaopen_luaossl_cipher() */
 
 
 /*
@@ -12312,13 +12312,13 @@ static const auxL_Reg or_globals[] = {
 	{ NULL, NULL },
 };
 
-EXPORT int luaopen__openssl_ocsp_response(lua_State *L) {
+EXPORT int luaopen_luaossl_ocsp_response(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, or_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_ocsp_response() */
+} /* luaopen_luaossl_ocsp_response() */
 
 
 /*
@@ -12384,14 +12384,14 @@ static const auxL_IntegerReg ob_verify_flags[] = {
 	{ NULL, 0 },
 };
 
-EXPORT int luaopen__openssl_ocsp_basic(lua_State *L) {
+EXPORT int luaopen_luaossl_ocsp_basic(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, ob_globals, 0);
 	auxL_setintegers(L, ob_verify_flags);
 
 	return 1;
-} /* luaopen__openssl_ocsp_basic() */
+} /* luaopen_luaossl_ocsp_basic() */
 
 
 /*
@@ -12775,7 +12775,7 @@ static const auxL_Reg rand_globals[] = {
 	{ NULL,      NULL },
 };
 
-EXPORT int luaopen__openssl_rand(lua_State *L) {
+EXPORT int luaopen_luaossl_rand(lua_State *L) {
 	struct randL_state *st;
 
 	initall(L);
@@ -12785,7 +12785,7 @@ EXPORT int luaopen__openssl_rand(lua_State *L) {
 	auxL_newlib(L, rand_globals, 1);
 
 	return 1;
-} /* luaopen__openssl_rand() */
+} /* luaopen_luaossl_rand() */
 
 
 /*
@@ -12823,13 +12823,13 @@ static const auxL_Reg des_globals[] = {
 	{ NULL,            NULL },
 };
 
-EXPORT int luaopen__openssl_des(lua_State *L) {
+EXPORT int luaopen_luaossl_des(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, des_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_des() */
+} /* luaopen_luaossl_des() */
 
 
 #if !OPENSSL_PREREQ(1,1,0)

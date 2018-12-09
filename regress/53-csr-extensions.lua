@@ -2,7 +2,7 @@
 
 local auxlib = require"openssl.auxlib"
 local pkey = require "openssl.pkey"
-local x509_csr = require"_openssl.x509.csr"
+local x509_csr = require"openssl.x509.csr"
 local x509_altname = require"openssl.x509.altname"
 local x509_name = require"openssl.x509.name"
 

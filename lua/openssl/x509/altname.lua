@@ -1,4 +1,4 @@
-local altname = require"_openssl.x509.altname"
+local altname = require"luaossl.x509.altname"
 local auxlib = require"openssl.auxlib"
 
 altname.interpose("__tostring", function (self)

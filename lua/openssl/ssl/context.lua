@@ -1,15 +1,9 @@
-local ssl = require"_openssl.ssl"
+local ctx = require"luaossl.ssl.context"
 
 local pack = table.pack or function(...) return { n = select("#", ...); ... } end
 
-ssl.interpose("setStore", function(self, store)
-	self:setChainStore(store)
-	self:setVerifyStore(store)
-	return true
-end)
-
 -- Allow passing a vararg of ciphers, or an array
-local setCipherList; setCipherList = ssl.interpose("setCipherList", function (self, ciphers, ...)
+local setCipherList; setCipherList = ctx.interpose("setCipherList", function (self, ciphers, ...)
 	if (...) then
 		local ciphers_t = pack(ciphers, ...)
 		ciphers = table.concat(ciphers_t, ":", 1, ciphers_t.n)
@@ -20,9 +14,9 @@ local setCipherList; setCipherList = ssl.interpose("setCipherList", function (se
 end)
 
 -- Allow passing a vararg of ciphersuites, or an array
-local setCipherSuites = ssl.interpose("setCipherSuites", nil)
+local setCipherSuites = ctx.interpose("setCipherSuites", nil)
 if setCipherSuites then
-	ssl.interpose("setCipherSuites", function (self, ciphers, ...)
+	ctx.interpose("setCipherSuites", function (self, ciphers, ...)
 		if (...) then
 			local ciphers_t = pack(ciphers, ...)
 			ciphers = table.concat(ciphers_t, ":", 1, ciphers_t.n)
@@ -34,7 +28,7 @@ if setCipherSuites then
 end
 
 -- Allow passing a vararg of curves, or an array
-local setGroups = ssl.interpose("setGroups", nil)
+local setGroups = ctx.interpose("setGroups", nil)
 if setGroups then
 	local function varargSetGroups(self, group, ...)
 		if (...) then
@@ -45,8 +39,8 @@ if setGroups then
 		end
 		return setGroups(self, group)
 	end
-	ssl.interpose("setGroups", varargSetGroups)
-	ssl.interpose("setCurvesList", varargSetGroups)
+	ctx.interpose("setGroups", varargSetGroups)
+	ctx.interpose("setCurvesList", varargSetGroups)
 end
 
-return ssl
+return ctx

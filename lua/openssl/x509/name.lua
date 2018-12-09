@@ -1,4 +1,4 @@
-local name = require"_openssl.x509.name"
+local name = require"luaossl.x509.name"
 local auxlib = require"openssl.auxlib"
 
 name.interpose("__tostring", function (self)

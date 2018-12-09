@@ -1,0 +1,64 @@
+cmake_minimum_required(VERSION 2.6)
+
+option(USE_LUA53 "Controls whether the library will be for Lua 5.3 or Ravi, default is OFF" OFF)
+
+SET(CMAKE_MODULE_PATH
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
+  "${CMAKE_MODULE_PATH}")
+
+find_package(Lua REQUIRED)
+find_package(OpenSSL REQUIRED)
+
+message(STATUS "LUA_INCLUDE_DIR: ${LUA_INCLUDE_DIR}")
+message(STATUS "LUA_LIBRARIES  : ${LUA_LIBRARIES}")
+
+message(STATUS "LUA_INCDIR     : ${LUA_INCDIR}")
+message(STATUS "LUA_LIBDIR     : ${LUA_LIBDIR}")
+message(STATUS "LUA_BINDIR     : ${LUA_BINDIR}")
+message(STATUS "LUALIB         : ${LUALIB}")
+message(STATUS "LIBDIR (LUA_CPATH)  : ${LIBDIR}")
+message(STATUS "LUADIR (LUA_PATH)   : ${LUADIR}")
+
+message(STATUS "OPENSSL_INCLUDE_DIR : ${OPENSSL_INCLUDE_DIR}")
+message(STATUS "OPENSSL_LIBRARIES   : ${OPENSSL_LIBRARIES}")
+
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}")
+INCLUDE_DIRECTORIES("${LUA_INCDIR}")
+INCLUDE_DIRECTORIES("${OPENSSL_INCLUDE_DIR}")
+LINK_DIRECTORIES("${LUA_LIBDIR}")
+
+SET(src 
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/openssl.c"
+  )
+SET(luasrc "${CMAKE_CURRENT_SOURCE_DIR}/lua/openssl.lua")
+
+# When using MSVC
+IF(MSVC)
+  # we want to respect the standard, and we are bored of those **** .
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE=1)
+ENDIF(MSVC)
+
+if ( WIN32 AND NOT CYGWIN )
+  set ( LIB_SOCKET ws2_32 )
+endif ()
+
+ADD_LIBRARY("luaossl" SHARED ${src})
+set_target_properties("luaossl" PROPERTIES PREFIX "")
+SET_TARGET_PROPERTIES("luaossl" PROPERTIES
+  IMPORT_PREFIX "lib")
+IF(APPLE)
+  SET_TARGET_PROPERTIES("luaossl" PROPERTIES
+    LINK_FLAGS "-undefined dynamic_lookup")
+ENDIF()
+SET_TARGET_PROPERTIES("luaossl" PROPERTIES
+    DEFINE_SYMBOL "LUAOSSL_IMPLEMENTATION")
+IF(LUALIB)
+  TARGET_LINK_LIBRARIES(luaossl ${LUALIB} ${OPENSSL_LIBRARIES} ${LIB_SOCKET})
+ENDIF()
+    
+INSTALL(DIRECTORY lua/openssl DESTINATION ${LUADIR})
+INSTALL(FILES ${luasrc} DESTINATION ${LUADIR})
+INSTALL(TARGETS luaossl
+  LIBRARY DESTINATION ${LIBDIR}
+  RUNTIME DESTINATION ${LUA_BINDIR})
+
