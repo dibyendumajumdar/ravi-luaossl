@@ -12225,13 +12225,13 @@ static const auxL_Reg kdf_globals[] = {
 	{ NULL,        NULL },
 };
 
-int luaopen__openssl_kdf(lua_State *L) {
+int luaopen_luaossl_kdf(lua_State *L) {
 	initall(L);
 
 	auxL_newlib(L, kdf_globals, 0);
 
 	return 1;
-} /* luaopen__openssl_kdf() */
+} /* luaopen__luaossl_kdf() */
 
 
 /*
